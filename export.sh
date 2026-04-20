@@ -13,7 +13,8 @@ SDK="$(cat "${HOME}/.Garmin/ConnectIQ/current-sdk.cfg")"
 PROJECT_FOLDER=${PWD}
 PROJECT_NAME=$(basename "${PROJECT_FOLDER}")
 
-
+# Branch name
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 echo -e "\nGenerate ${PROJECT_NAME}_TEST..."
 DEV_KEY="${HOME}/.Garmin/ConnectIQ/keys/developer_key_test.der"
