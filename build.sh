@@ -13,6 +13,10 @@ SDK="$(cat "${HOME}/.Garmin/ConnectIQ/current-sdk.cfg")"
 PROJECT_FOLDER=${PWD}
 PROJECT_NAME=$(basename "${PROJECT_FOLDER}")
 PROJECT_NAME="RearGearIndex"
+
+APP_TEST_ID="c4755d9c-e9e1-4924-b458-04e708ce9999"
+APP_PROD_ID="c4755d9c-e9e1-4924-b458-04e708ce0000"
+
 SYSTEM="Test"
 
 # Branch name
@@ -27,8 +31,22 @@ VERSION=${VERSION}.${BUILD}
 echo "    GIT Build=${OLDBUILD}"
 echo "Version Build=${OLDBUILD}"
 if[[ ${BUILD} -ne ${OLDBUILD} ]]; then
-    # https://www.freeformatter.com/xpath-tester.html#before-output
-    #xml=$(echo -e "cd /studentFile/student[studentName='CLASSA']/studentActions/studentAction[studentType='Juniour']/studentStatus\nset failed\nsave -" | xmllint --shell <(echo "$xml"))
+    xmllint --shell resources/strings/strings.xml << EOF
+cd /strings/string[@id="version"]/
+set $(date +"%T")
+save
+EOF
+echo "Status=$?"
+cat resources/strings/strings.xml
+
+
+<iq:manifest>
+    <iq:application id="c4755d9c-e9e1-4924-b458-04e708ce0000" type="datafield" name="@Strings.AppName" entry="SlavicsRearGearSimpleApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.1.0">
+
+xmllint --xpath "/iq:manifest/iq:application/@id/@value" manifest.xml | echo "status=$?"
+fi
+
+
 BUILD=$((BUILD+1))
 
 git add .
