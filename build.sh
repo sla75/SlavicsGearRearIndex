@@ -19,8 +19,22 @@ SYSTEM="Test"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 [[ "${BRANCH}" == "main" ]] && SYSTEM="";
 
-#BUILD=$(git rev-list --count --all)
 BUILD=$(git rev-list HEAD --count)
+VERSION=$(xmllint --xpath "//strings/string[@id='version']/text()" resources/strings/strings.xml)
+OLDBUILD="${VERSION##*.}"
+VERSION=${VERSION%.*}
+VERSION=${VERSION}.${BUILD}
+echo "    GIT Build=${OLDBUILD}"
+echo "Version Build=${OLDBUILD}"
+if[[ ${BUILD} -ne ${OLDBUILD} ]]; then
+    #xml=$(echo -e "cd /studentFile/student[studentName='CLASSA']/studentActions/studentAction[studentType='Juniour']/studentStatus\nset failed\nsave -" | xmllint --shell <(echo "$xml"))
+BUILD=$((BUILD+1))
+
+git add .
+git commit -m "Build version ${VERSION}"
+
+#BUILD=$(git rev-list --count --all)
+
 
 VERSION=$(xmllint --xpath "//strings/string[@id='version']/text()" resources/strings/strings.xml)
 echo "1. Version=${VERSION}"
@@ -30,9 +44,10 @@ echo "2. Version=${VERSION}"
 VERSION=${VERSION}.${BUILD}
 echo "3. Version=${VERSION}"
 
-if[[ ${BUILD} -ne ${OLDBUILD} ]]; then
-    #xml=$(echo -e "cd /studentFile/student[studentName='CLASSA']/studentActions/studentAction[studentType='Juniour']/studentStatus\nset failed\nsave -" | xmllint --shell <(echo "$xml"))
-fi;
+
+
+
+
 
 exit 0
 
