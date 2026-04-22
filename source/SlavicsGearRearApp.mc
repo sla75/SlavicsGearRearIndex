@@ -18,7 +18,8 @@ class SlavicsRearGearSimpleApp extends Application.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() as [Views] or [Views, InputDelegates] {
-        return [ new SlavicsGearRearSimpleView() ];
+        return [ new SlavicsGearRearView() ];
+        //return [ new SlavicsGearRearSimpleView() ];
     }
 
 }

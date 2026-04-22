@@ -5,7 +5,7 @@ import Toybox.Math;
 import Toybox.System;
 import Toybox.WatchUi;
 
-class SpeedFieldView extends WatchUi.DataField {
+class SlavicsGearRearView extends WatchUi.DataField {
 
     function initialize() {
         DataField.initialize();
