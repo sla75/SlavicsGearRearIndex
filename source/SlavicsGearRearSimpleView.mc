@@ -5,7 +5,7 @@ import Toybox.System;
 import Toybox.Time;
 import Toybox.WatchUi;
 
-class SlavicsRearGearSimpleView extends WatchUi.SimpleDataField {
+class SlavicsGearRearSimpleView extends WatchUi.SimpleDataField {
     private var bikeShift=new AntPlus.Shifting(new AntPlus.ShiftingListener()) as AntPlus.Shifting;
     private var name;
     // Set the label of the data field here.
