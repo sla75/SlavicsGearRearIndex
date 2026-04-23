@@ -69,7 +69,9 @@ class SlavicsSimpleDataField extends WatchUi.DataField {
     }
     
     public function compute(info as Activity.Info) as Void {
+        valueArea.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_WHITE:Graphics.COLOR_BLACK);
         valueArea.setText(textValue);
+        labelArea.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_LT_GRAY:Graphics.COLOR_DK_GRAY);
         labelArea.setText(textLabel);
     }
 
@@ -89,10 +91,10 @@ class SlavicsSimpleDataField extends WatchUi.DataField {
     }
     (:debug)
     private function onUpdateAfter(dc as Dc) as Void {
-        dc.setColor(Graphics.COLOR_TRANSPARENT, System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_BLACK:Graphics.COLOR_WHITE);
-        dc.clear();
-        valueArea.draw(dc);
-        labelArea.draw(dc);
+        //dc.setColor(Graphics.COLOR_TRANSPARENT, System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_BLACK:Graphics.COLOR_WHITE);
+        //dc.clear();
+        //valueArea.draw(dc);
+        //labelArea.draw(dc);
 
         dc.setColor(Graphics.COLOR_LT_GRAY,Graphics.COLOR_TRANSPARENT);
         dc.drawRectangle(rim,rim,dc.getWidth()-2*rim,dc.getHeight()*LABELHEIGHT-rim);
