@@ -5,7 +5,7 @@
         Use "Monkey C: Edit Application" from the Visual Studio Code command palette
         to update the application attributes.
     -->
-    <!--    TEST id="c4755d9c-e9e1-4924-b458-04e708ce0000"
+    <!--    TEST id="c4755d9c-e9e1-4924-b458-04e708ce9999"
             PROD id="c4755d9c-e9e1-4924-b458-04e708ce0001"
     -->
     <iq:application id="c4755d9c-e9e1-4924-b458-04e708ce9999" type="datafield" name="@Strings.AppName" entry="SlavicsRearGearSimpleApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.3.0">
