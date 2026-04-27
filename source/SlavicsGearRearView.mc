@@ -47,14 +47,14 @@ class SlavicsGearRearView extends SlavicsSimpleDataField {
         self.setTextLabel(label);
     }
     /***/
-    
+    private var lastIndex=-1 as Number;
     function compute(info as Activity.Info) as Void {
         SlavicsSimpleDataField.compute(info);
         var bsds=getDeviceState() as AntPlus.DeviceState;
         if(bsds!=null&&bsds.state!=null){
             switch(bsds.state){
                 case AntPlus.DEVICE_STATE_SEARCHING:
-                    self.setTextLabel(System.getClockTime().sec%2==0?"  "+label+". ":"  "+label+"..");
+                    self.setTextLabel(System.getClockTime().sec%2==0?" ."+label+". ":".."+label+"..");
                     break;
                 case AntPlus.DEVICE_STATE_TRACKING:
                     self.setTextLabel(label);
@@ -63,6 +63,7 @@ class SlavicsGearRearView extends SlavicsSimpleDataField {
                     self.setTextLabel("?"+label+"?");
             }
             
+            // TODO Debug
             var ids=bikeShift.getComponentIdentifiers() as Array<Number> or Null;
             batteries=[] as Array<BatteryData>;
             if(ids!=null){
@@ -85,17 +86,29 @@ class SlavicsGearRearView extends SlavicsSimpleDataField {
         var rds=getRearDerailleurStatus() as AntPlus.DerailleurStatus;
         teethsLabel.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_LT_GRAY:Graphics.COLOR_DK_GRAY);
         if(rds!=null){
-                if(rds.gearIndex!=AntPlus.REAR_GEAR_INVALID){    
+                if(rds.gearIndex!=AntPlus.REAR_GEAR_INVALID){
+                    if(rds.gearIndex!=lastIndex){
+                        valueArea.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_DK_GRAY:Graphics.COLOR_LT_GRAY);
+                    } else if(rds.gearIndex==0||rds.gearIndex==rds.gearMax-1){
+                        valueArea.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_RED:Graphics.COLOR_DK_RED);
+                    }else{
+                        valueArea.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_WHITE:Graphics.COLOR_BLACK);
+                    }
                     setTextValue((rds.gearIndex+1).toString());
                     teethsLabel.setText(rds.gearSize+unitTeeths);
+                    lastIndex=rds.gearIndex;
                 } else {
+                    valueArea.setColor(Graphics.COLOR_LT_GRAY);
                     setTextValue("Inv.");
                     //teethsLabel.setText("--"+unitTeeths);
                     teethsLabel.setText("");
+                    lastIndex=-1;
                 }
         } else {
             teethsLabel.setText(".");
+            valueArea.setColor(Graphics.COLOR_LT_GRAY);
             setTextValue("..");
+            lastIndex=-2;
         }
     }
     public static const STATUSES =[null,
