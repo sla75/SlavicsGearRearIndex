@@ -8,7 +8,7 @@
     <!--    TEST id="c4755d9c-e9e1-4924-b458-04e708ce9999"
             PROD id="c4755d9c-e9e1-4924-b458-04e708ce0001"
     -->
-    <iq:application id="c4755d9c-e9e1-4924-b458-04e708ce9999" type="datafield" name="@Strings.AppName" entry="SlavicsGearIndexApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.3.0">
+    <iq:application id="c4755d9c-e9e1-4924-b458-04e708ce9999" type="datafield" name="@Strings.AppName" entry="SlavicsGearIndexApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="5.1.0">
         <!--
             Use the following from the Visual Studio Code comand palette to edit
             the build targets:

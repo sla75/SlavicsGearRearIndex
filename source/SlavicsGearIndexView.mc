@@ -80,8 +80,8 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
 
         var rds=rearShift.getRearDerailleurStatus() as AntPlus.DerailleurStatus;
         teethsLabel.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_LT_GRAY:Graphics.COLOR_DK_GRAY);
-        if(rds!=null){
-                if(rds.gearIndex!=AntPlus.REAR_GEAR_INVALID){
+        if(rds!=null && rds has :gearIndex){
+                if(rds.gearIndex!=null&&rds.gearIndex!=AntPlus.REAR_GEAR_INVALID){
                     if(rds.gearIndex!=lastIndex){
                         valueArea.setColor(System.getDeviceSettings().isNightModeEnabled?Graphics.COLOR_DK_GRAY:Graphics.COLOR_LT_GRAY);
                     } else if(rds.gearIndex==0||rds.gearIndex==rds.gearMax-1){
