@@ -21,6 +21,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     private var unitTeeths as String;
     private var label as String;
     private var lastIndex=-1 as Number;
+    private var colorMode as ColorMode;
 
     function initialize() {
         System.println("SlavicsGearRearView.initialize()");
@@ -29,6 +30,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         label=Application.loadResource(Rez.Strings.label);
         Properties.setValue("property_version",Application.loadResource(Rez.Strings.version));
         Properties.setValue("property_showteeth",Properties.getValue("property_showteeth")==null?true:Properties.getValue("property_showteeth") as Boolean);
+        colorMode=new ColorMode();
         handleSettingUpdate();
     }
 
@@ -53,6 +55,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     public function handleSettingUpdate() as Void {
         System.println("SlavicsGearRearView.onSettingsChanged()");
         teethsLabel.setVisible(Properties.getValue("property_showteeth") as Boolean);
+        colorMode.handleSettingUpdate();
     }
     /***
     function onShow() {
@@ -63,8 +66,8 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     /***/
     function compute(info as Activity.Info) as Void {
         SlavicsSimpleDataField.compute(info);
-        var nightMode=isNightMode();
-        SlavicsSimpleDataField.setNightMode(nightMode);
+        colorMode.compute();
+        SlavicsSimpleDataField.setColors(colorMode.getColors());
         var bsds=rearShift.getDeviceState() as AntPlus.DeviceState;
         if(bsds!=null&&bsds.state!=null){
             switch(bsds.state){
@@ -81,34 +84,33 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         }
 
         var rds=rearShift.getRearDerailleurStatus() as AntPlus.DerailleurStatus;
-        teethsLabel.setColor(nightMode?Graphics.COLOR_LT_GRAY:Graphics.COLOR_DK_GRAY);
+        teethsLabel.setColor(colorMode.getFieldColor(:label));
         if(rds!=null){
                 if(rds.gearIndex!=null&&rds.gearIndex!=AntPlus.REAR_GEAR_INVALID){
                     if(rds.gearIndex!=lastIndex){
-                        valueArea.setColor(nightMode?Graphics.COLOR_DK_GRAY:Graphics.COLOR_LT_GRAY);
+                        valueArea.setColor(colorMode.getFieldColor(:valueChange));
                     } else if(rds.gearIndex==0||rds.gearIndex==rds.gearMax-1){
-                        valueArea.setColor(nightMode?Graphics.COLOR_RED:Graphics.COLOR_DK_RED);
-                    }else{
-                        valueArea.setColor(nightMode?Graphics.COLOR_WHITE:Graphics.COLOR_BLACK);
+                        valueArea.setColor(colorMode.getFieldColor(:valueEdge));
                     }
                     setTextValue((rds.gearIndex+1).toString());
                     teethsLabel.setText(rds.gearSize+unitTeeths);
                     lastIndex=rds.gearIndex;
                 } else {
-                    valueArea.setColor(Graphics.COLOR_LT_GRAY);
+                    valueArea.setColor(colorMode.getFieldColor(:error));
                     setTextValue("Inv.");
                     teethsLabel.setText("");
                     lastIndex=-1;
                 }
         } else {
             teethsLabel.setText(".");
-            valueArea.setColor(Graphics.COLOR_LT_GRAY);
+            valueArea.setColor(colorMode.getFieldColor(:error));
             setTextValue("..");
             lastIndex=-2;
         }
     }
     var battIcon=new BatteryIcon({:font=>WatchUi.loadResource(Rez.Fonts.BatterySmall),:justification=>Graphics.TEXT_JUSTIFY_RIGHT});
-    var battFont=Graphics.FONT_TINY;
+    var battFontS=Graphics.FONT_TINY;
+    var battFontM=Graphics.FONT_SMALL;
     public function onUpdate(dc as Dc) as Void {
         System.println("SlavicsGearRearView.onUpdate()");
         SlavicsSimpleDataField.onUpdate(dc);
@@ -119,20 +121,31 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
             // Draw batteries
             
             var bLocX=dc.getWidth()-rim;
-            var bLocY=dc.getHeight()-rim-Graphics.getFontAscent(battFont);
+            var bLocY=dc.getHeight()-rim-Graphics.getFontAscent(battFontS);
             battIcon.locY=dc.getHeight()-rim-Graphics.getFontAscent(battIcon.getFont());
             for(var i=0;i<batteries.size();i++){
                 var bd=(batteries as Array<RearShifting.BatteryData>)[i] as RearShifting.BatteryData;
-                //dc.setColor(bd.get(:color),Graphics.COLOR_TRANSPARENT);                
-                //dc.drawText(bLocX,bLocY,font,BATTERY_STATUS_TEXT[bd.get(:batteryStatus)],Graphics.TEXT_JUSTIFY_RIGHT);
-                //bLocX-=dc.getTextWidthInPixels("."+BATTERY_STATUS_TEXT[bd.get(:batteryStatus)],font);
-                dc.setColor(Graphics.COLOR_DK_GRAY,Graphics.COLOR_TRANSPARENT);                
-                dc.drawText(bLocX,bLocY,battFont,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
-                bLocX-=dc.getTextWidthInPixels(bd.get(:name),battFont)+3;
+                switch (bd.get(:batteryStatus)) {
+                    case AntPlus.BATT_STATUS_NEW:
+                        break;
+                    case AntPlus.BATT_STATUS_GOOD:
+                        break;
+                    case AntPlus.BATT_STATUS_OK:
+                        break;
+                    default:
+                        dc.setColor(colorMode.getFieldColor(:batteryName),Graphics.COLOR_TRANSPARENT);
+                        dc.drawText(bLocX,bLocY,battFontS,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
+                        bLocX-=dc.getTextWidthInPixels(bd.get(:name),battFontS)+3;
+                        dc.drawText(bLocX,bLocY+Graphics.getFontAscent(battFontS)-Graphics.getFontAscent(battFontM),battFontM,bd.get(:percentage),Graphics.TEXT_JUSTIFY_RIGHT);
+                        bLocX-=dc.getTextWidthInPixels(bd.get(:percentage),battFontM)+3;
+                        break;
+                }
+                /***
                 battIcon.locX=bLocX;
                 battIcon.compute(bd.get(:batteryStatus),false);
                 battIcon.draw(dc);
                 bLocX-=battIcon.getWidth(dc)+3;
+                /***/
             }
             /***
             battIcon.locX=bLocX;
@@ -166,9 +179,6 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
             //bLocX-=dc.getTextWidthInPixels(bd.get(:name)+" ",Graphics.FONT_XTINY);
             /***/
         }
-    }
-    private function isNightMode() as Boolean {
-        return (Properties.getValue("property_nightMode") as Boolean)?!System.getDeviceSettings().isNightModeEnabled:System.getDeviceSettings().isNightModeEnabled;
     }
 }
 /***

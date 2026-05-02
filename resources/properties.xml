@@ -4,6 +4,7 @@
         <property id="property_version" type="string">0.0.0</property>
         <property id="property_showteeth" type="boolean">true</property>
         <property id="property_nightMode" type="boolean">false</property>
+        <property id="property_colorMode" type="number">0</property>
     </properties>
 
     <settings>
@@ -15,6 +16,14 @@
         </setting>
         <setting propertyKey="@Properties.property_nightMode" title="@Strings.property_nightMode_title">
             <settingConfig type="boolean" required="true" />
+        </setting>
+        <setting propertyKey="@Properties.property_colorMode" title="@Strings.property_colorMode_title">
+            <settingConfig type="list">
+                <listEntry value="0">Black and White</listEntry>
+                <listEntry value="1">Blue</listEntry>
+                <listEntry value="2">Green</listEntry>
+                <listEntry value="3">Pink</listEntry>
+            </settingConfig>
         </setting>
     </settings>
 </resources>

@@ -56,7 +56,7 @@ class BatteryIcon extends Drawable {
         //dc.drawText(50,50,font,"0123456",Graphics.TEXT_JUSTIFY_RIGHT);
         //System.println("BatteryIcon.draw() status="+status.toString());
         //System.println("BatteryIcon.draw() char="+BATCHAR.get(status));
-        dc.setColor(BATTERY_STATUS_COLOR[status],Graphics.COLOR_TRANSPARENT);
+        dc.setColor(BATTERY_STATUS_COLOR[status],Graphics.COLOR_WHITE);
         dc.drawText(self.locX,self.locY,fontBattery,BATCHAR.get(status),self.justify);
         if(charge){
             dc.setColor(Graphics.COLOR_RED,Graphics.COLOR_TRANSPARENT);

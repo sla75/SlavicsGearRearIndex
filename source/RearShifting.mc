@@ -11,6 +11,7 @@ class RearShifting {
             :batteryVoltage as Float,
             :operatingTime as Number,
             :color as Graphics.ColorType,
+            :percentage as String,
         };
 
     public static const BATTERY_STATUS_COLOR = [0,Graphics.COLOR_DK_GREEN,Graphics.COLOR_DK_GREEN,Graphics.COLOR_DK_GREEN,Graphics.COLOR_ORANGE,Graphics.COLOR_RED,0,Graphics.COLOR_DK_RED,Graphics.COLOR_LT_GRAY] as Array<ColorType>;
@@ -29,11 +30,11 @@ class RearShifting {
     (:debug)
     private const DEBUG_TEETHS = [51, 45, 39, 33, 28, 24, 21, 18, 16, 14, 12, 10] as Array<Number>;
 
-    private var bikeShift=new AntPlus.Shifting(new AntPlus.ShiftingListener()) as AntPlus.Shifting;
+    private var shiftDevice=new AntPlus.Shifting(new AntPlus.ShiftingListener()) as AntPlus.Shifting;
         
     (:release)
     public function getDeviceState() as AntPlus.DeviceState {
-        return bikeShift.getDeviceState() as AntPlus.DeviceState;
+        return shiftDevice.getDeviceState() as AntPlus.DeviceState;
     }
 
     (:debug)
@@ -53,11 +54,11 @@ class RearShifting {
     }
     (:release)
     public function getRearDerailleurStatus() as AntPlus.DerailleurStatus {
-        return bikeShift.getShiftingStatus().rearDerailleur;
+        return shiftDevice.getShiftingStatus().rearDerailleur;
     }
     (:debug)
     public function getRearDerailleurStatus() as AntPlus.DerailleurStatus {
-        var ss=bikeShift.getShiftingStatus() as AntPlus.ShiftingStatus;
+        var ss=shiftDevice.getShiftingStatus() as AntPlus.ShiftingStatus;
         if(ss==null||ss.rearDerailleur.gearIndex==AntPlus.REAR_GEAR_INVALID){
             
             var rearDerailleur=new DerailleurStatus();
@@ -96,9 +97,32 @@ class RearShifting {
                 var b={:identifier=>id} as BatteryData;
                 b.put(:name,BATTERY_NAME.hasKey(id)?BATTERY_NAME.get(id):id.format("%X"));
                 b.put(:batteryStatus,bs.batteryStatus==null?AntPlus.BATT_STATUS_INVALID:bs.batteryStatus);
-                b.put(:batteryVoltage,(bs has :batteryVoltage && bs.batteryVoltage!=null)?bs.batteryVoltage:0f);
-                b.put(:operatingTime,(bs has :operatingTime && bs.operatingTime!=null)?bs.batteryVoltage:0);
+                //b.put(:batteryVoltage,(bs has :batteryVoltage && bs.batteryVoltage!=null)?bs.batteryVoltage:0f);
+                //b.put(:operatingTime,(bs has :operatingTime && bs.operatingTime!=null)?bs.batteryVoltage:0);
                 b.put(:color,BATTERY_STATUS_COLOR[bs.batteryStatus]);
+                switch (b.get(:batteryStatus)) {
+                    case AntPlus.BATT_STATUS_NEW:
+                        b.put(:percentage,"100%");
+                        break;
+                    case AntPlus.BATT_STATUS_GOOD:
+                        b.put(:percentage,"80%");
+                        break;
+                    case AntPlus.BATT_STATUS_OK:
+                        b.put(:percentage,"50%");
+                        break;
+                    case AntPlus.BATT_STATUS_LOW:
+                        b.put(:percentage,"30%");
+                        break;
+                    case AntPlus.BATT_STATUS_CRITICAL:
+                        b.put(:percentage,"15%");
+                        break;
+                    case AntPlus.BATT_STATUS_CNT:
+                        b.put(:percentage,"X");
+                        break;
+                    default:
+                        b.put(:percentage,"--%");
+                        break;
+                }
                 batteries.add(b);
                 /***
                 batteries.add({
@@ -117,30 +141,45 @@ class RearShifting {
 
     (:release)
     public function getBatteries() as Array<BatteryData> {
-        var ids=bikeShift.getComponentIdentifiers() as Array<Number> or Null;
+        var ids=shiftDevice.getComponentIdentifiers() as Array<Number> or Null;
         var batteries=[] as Array<BatteryData>;
         if(ids!=null){
             for(var i=0;i<ids.size();i++){
                 var id=ids[i];
-                var bs=bikeShift.getBatteryStatus(id) as BatteryStatus;
-                if(bs has :batteryStatus && bs!=null){
+                var bs=shiftDevice.getBatteryStatus(id) as BatteryStatus;
+                if(bs!=null){
                     var b={:identifier=>id} as BatteryData;
                     b.put(:name,BATTERY_NAME.hasKey(id)?BATTERY_NAME.get(id):id.format("%X"));
                     b.put(:batteryStatus,bs.batteryStatus==null?AntPlus.BATT_STATUS_INVALID:bs.batteryStatus);
-                    b.put(:batteryVoltage,(bs has :batteryVoltage && bs.batteryVoltage!=null)?bs.batteryVoltage:0f);
-                    b.put(:operatingTime,(bs has :operatingTime && bs.operatingTime!=null)?bs.batteryVoltage:0);
-                    b.put(:color,BATTERY_STATUS_COLOR[bs.batteryStatus]);
-                    batteries.add(b);
+                    //b.put(:batteryVoltage,bs.batteryVoltage!=null?bs.batteryVoltage:0f);
+                    //b.put(:operatingTime,bs.operatingTime!=null?bs.batteryVoltage:0);
+                    b.put(:color,BATTERY_STATUS_COLOR[bs.batteryStatus==null?AntPlus.BATT_STATUS_INVALID:bs.batteryStatus]);
                     /***
-                    batteries.add({
-                        :identifier=>id,
-                        :name=>BATTERY_NAME.hasKey(id)?BATTERY_NAME.get(id):id.format("%X"),
-                        :batteryStatus=>bs.batteryStatus==null?AntPlus.BATT_STATUS_INVALID:bs.batteryStatus,
-                        :batteryVoltage=>(bs has :batteryVoltage && bs.batteryVoltage!=null)?bs.batteryVoltage:0f,
-                        :operatingTime=>(bs has :operatingTime && bs.operatingTime!=null)?bs.batteryVoltage:0,
-                        :color=>BATTERY_STATUS_COLOR[bs.batteryStatus]
-                    } as BatteryData);
+                    switch (b.get(:batteryStatus)) {
+                        case AntPlus.BATT_STATUS_NEW:
+                            b.put(:percentage,"100%");
+                            break;
+                        case AntPlus.BATT_STATUS_GOOD:
+                            b.put(:percentage,"80%");
+                            break;
+                        case AntPlus.BATT_STATUS_OK:
+                            b.put(:percentage,"50%");
+                            break;
+                        case AntPlus.BATT_STATUS_LOW:
+                            b.put(:percentage,"30%");
+                            break;
+                        case AntPlus.BATT_STATUS_CRITICAL:
+                            b.put(:percentage,"15%");
+                            break;
+                        case AntPlus.BATT_STATUS_CNT:
+                            b.put(:percentage,"X");
+                            break;
+                        default:
+                            b.put(:percentage,"--%");
+                            break;
+                    }
                     /***/
+                    batteries.add(b);
                 }
             }
         }

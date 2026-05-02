@@ -6,7 +6,7 @@ import Toybox.System;
 import Toybox.WatchUi;
 
 class SlavicsSimpleDataField extends WatchUi.DataField {
-    private const LABELHEIGHT=0.3f as Numeric;
+    private const LABELHEIGHT=0.25f as Numeric;
     public const FONTS=[
             Graphics.FONT_NUMBER_THAI_HOT,
             Graphics.FONT_NUMBER_HOT,
@@ -33,7 +33,7 @@ class SlavicsSimpleDataField extends WatchUi.DataField {
         }) as TextArea;
     public var rim=0 as Number;
     public var labelLine=0 as Number;
-    public var nightMode=false as Boolean;
+    public var colors={:background=>Graphics.COLOR_WHITE,:label=>Graphics.COLOR_DK_GRAY,:value=>Graphics.COLOR_BLACK} as Dictionary<Symbol,Graphics.ColorValue>;
     //protected var textLabel="Label" as String;
     //protected var textValue="Value" as String;
 
@@ -69,21 +69,24 @@ class SlavicsSimpleDataField extends WatchUi.DataField {
         valueArea.setText(text!=null?text:"--");
     }
     
-    public function setNightMode(nm as Boolean){
-        nightMode=nm;
+    public function setColors(colors as Dictionary<Symbol,Graphics.ColorValue>){
+        self.colors=colors;
+        valueArea.setColor(colors.get(:value));
+        labelArea.setColor(colors.get(:label));
     }
-
+    /***
     public function compute(info as Activity.Info) as Void {
         valueArea.setColor(nightMode?Graphics.COLOR_WHITE:Graphics.COLOR_BLACK);
         labelArea.setColor(nightMode?Graphics.COLOR_LT_GRAY:Graphics.COLOR_DK_GRAY);
     }
+    /***/
 
     // Display the value you computed here. This will be called
     // once a second when the data field is visible.
     
     public function onUpdate(dc as Dc) as Void {
         System.println("SlavicsSimpleDataField.onUpdate()");
-        dc.setColor(Graphics.COLOR_TRANSPARENT,nightMode?Graphics.COLOR_BLACK:Graphics.COLOR_WHITE);
+        dc.setColor(Graphics.COLOR_TRANSPARENT,colors.get(:background));
         dc.clear();
         valueArea.draw(dc);
         labelArea.draw(dc);
