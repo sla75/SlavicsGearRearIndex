@@ -7,5 +7,5 @@
 
     <string id="property_version_title">Version</string>
     <string id="property_showteeth_title">Show sprocket size</string>
-    <string id="property_nightMode_title">Inverse night mode</string>
+    <string id="property_nightMode_title">Reverse night mode</string>
 </strings>
