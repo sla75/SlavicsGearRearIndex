@@ -154,7 +154,6 @@ class RearShifting {
                     //b.put(:batteryVoltage,bs.batteryVoltage!=null?bs.batteryVoltage:0f);
                     //b.put(:operatingTime,bs.operatingTime!=null?bs.batteryVoltage:0);
                     b.put(:color,BATTERY_STATUS_COLOR[bs.batteryStatus==null?AntPlus.BATT_STATUS_INVALID:bs.batteryStatus]);
-                    /***
                     switch (b.get(:batteryStatus)) {
                         case AntPlus.BATT_STATUS_NEW:
                             b.put(:percentage,"100%");
@@ -178,7 +177,6 @@ class RearShifting {
                             b.put(:percentage,"--%");
                             break;
                     }
-                    /***/
                     batteries.add(b);
                 }
             }

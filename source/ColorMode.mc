@@ -47,25 +47,9 @@ class ColorMode {
                 :valueChange=>Graphics.COLOR_LT_GRAY,
                 :error=>Graphics.COLOR_LT_GRAY,
                 :batteryName=>Graphics.COLOR_BLACK,
-            },:night=>{
-                :background=>Graphics.COLOR_DK_BLUE,
-                :label=>Graphics.COLOR_LT_GRAY,
-                :value=>Graphics.COLOR_WHITE,
-                :valueEdge=>Graphics.COLOR_RED,
-                :valueChange=>Graphics.COLOR_LT_GRAY,
-                :error=>Graphics.COLOR_DK_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
     private const MODE_GREEN={:day=>{
-                :background=>Graphics.COLOR_GREEN,
-                :label=>Graphics.COLOR_BLACK,
-                :value=>Graphics.COLOR_BLACK,
-                :valueEdge=>Graphics.COLOR_DK_RED,
-                :valueChange=>Graphics.COLOR_DK_GRAY,
-                :error=>Graphics.COLOR_LT_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
-            },:night=>{
                 :background=>Graphics.COLOR_DK_GREEN,
                 :label=>Graphics.COLOR_BLACK,
                 :value=>Graphics.COLOR_WHITE,
@@ -93,32 +77,33 @@ class ColorMode {
                 :batteryName=>Graphics.COLOR_BLACK,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
-    private var colors=MODE_BLACKANDWHITE as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
+    private var colors=MODE_BLACKANDWHITE as Dictionary<Symbol,Graphics.ColorValue>;
     function initialize() {
         System.println("ColorMode.initialize()");
-        //handleSettingUpdate();
     }
     
     public function handleSettingUpdate() as Void {
         System.println("ColorMode.onSettingsChanged()="+Properties.getValue("property_colorMode").toString());
         switch (Properties.getValue("property_colorMode") as Number) {
             case 0:
-                colors=MODE_BLACKANDWHITE;
+                colors=MODE_BLACKANDWHITE as Dictionary<Symbol,Graphics.ColorValue>;
                 break;
             case 1:
-                colors=MODE_BLUE;
+                colors=MODE_BLUE as Dictionary<Symbol,Graphics.ColorValue>;
                 break;
             case 2:
-                colors=MODE_GREEN;
+                colors=MODE_GREEN as Dictionary<Symbol,Graphics.ColorValue>;
                 break;
             case 3:
-                colors=MODE_PINK;
+                colors=MODE_PINK as Dictionary<Symbol,Graphics.ColorValue>;
                 break;
             default:
-                colors=MODE_BLACKANDWHITE;
+                colors=MODE_BLACKANDWHITE as Dictionary<Symbol,Graphics.ColorValue>;
                 break;
         }
-        //Properties.getValue("property_colorMode") as Number;
+        if(!colors.hasKey(:night)){
+            colors.put(:night,colors.get(:day));
+        }
     }
     public function compute() as Void {
         isNight=(Properties.getValue("property_nightMode") as Boolean)?!System.getDeviceSettings().isNightModeEnabled:System.getDeviceSettings().isNightModeEnabled;

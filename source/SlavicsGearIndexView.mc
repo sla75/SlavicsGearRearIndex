@@ -125,20 +125,12 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
             battIcon.locY=dc.getHeight()-rim-Graphics.getFontAscent(battIcon.getFont());
             for(var i=0;i<batteries.size();i++){
                 var bd=(batteries as Array<RearShifting.BatteryData>)[i] as RearShifting.BatteryData;
-                switch (bd.get(:batteryStatus)) {
-                    case AntPlus.BATT_STATUS_NEW:
-                        break;
-                    case AntPlus.BATT_STATUS_GOOD:
-                        break;
-                    case AntPlus.BATT_STATUS_OK:
-                        break;
-                    default:
-                        dc.setColor(colorMode.getFieldColor(:batteryName),Graphics.COLOR_TRANSPARENT);
-                        dc.drawText(bLocX,bLocY,battFontS,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
-                        bLocX-=dc.getTextWidthInPixels(bd.get(:name),battFontS)+3;
-                        dc.drawText(bLocX,bLocY+Graphics.getFontAscent(battFontS)-Graphics.getFontAscent(battFontM),battFontM,bd.get(:percentage),Graphics.TEXT_JUSTIFY_RIGHT);
-                        bLocX-=dc.getTextWidthInPixels(bd.get(:percentage),battFontM)+3;
-                        break;
+                if(bd.get(:batteryStatus)>3) {
+                    dc.setColor(colorMode.getFieldColor(:batteryName),Graphics.COLOR_TRANSPARENT);
+                    dc.drawText(bLocX,bLocY,battFontS,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
+                    bLocX-=dc.getTextWidthInPixels(bd.get(:name),battFontS)+3;
+                    dc.drawText(bLocX,bLocY+Graphics.getFontAscent(battFontS)-Graphics.getFontAscent(battFontM),battFontM,bd.get(:percentage),Graphics.TEXT_JUSTIFY_RIGHT);
+                    bLocX-=dc.getTextWidthInPixels(bd.get(:percentage),battFontM)+3;
                 }
                 /***
                 battIcon.locX=bLocX;
