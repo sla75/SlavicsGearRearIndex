@@ -71,18 +71,18 @@ fi
 
 #BUILD=$(git rev-list --count --all)
 
-echo -e "\nGenerate ${PROJECT_NAME}-${BUILD}..."
+echo -e "\nGenerate ${PROJECT_NAME}-${BUILD}${SYSTEM}..."
 DEV_KEY="${HOME}/.Garmin/ConnectIQ/developer_key.der"
 echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
     -jar "${SDK}"bin/monkeybrains.jar \
-    --output "bin/${PROJECT_NAME}-${BUILD}.iq"    \
+    --output "bin/${PROJECT_NAME}-${BUILD}${SYSTEM}.iq"    \
     --jungles "monkey.jungle" \
     --private-key ${DEV_KEY}    \
     --package-app --release --warn
-echo -e "Generated bin/${PROJECT_NAME}-${BUILD}.iq"
+echo -e "Generated bin/${PROJECT_NAME}-${BUILD}${SYSTEM}.iq"
 
 DEVICE=${1:-edge1050}
-OUTPUT_FILE="bin/${PROJECT_NAME}-${BUILD}_${DEVICE}.prg"
+OUTPUT_FILE="bin/${PROJECT_NAME}-${BUILD}${SYSTEM}_${DEVICE}.prg"
 
 #if [[ $1 == "" ]]; then
 #    >&2 echo Usage: ciq-release.sh [device]

@@ -13,8 +13,9 @@ https://github.com/sla75/SlavicsRearGearIndexSimple/issues
 
 Zobrazení:
 Hodnota
-    xx - No connect AntPlus.ShiftingStatus
-    .. - No exists Derailleur
+    -- - No connect AntPlus.ShiftingStatus
+    xx - No exists AntPlus.ShiftingStatus
+
 Název pole
     .label. - Search AntPlus gear device
     ?label? - Unknown status gear device

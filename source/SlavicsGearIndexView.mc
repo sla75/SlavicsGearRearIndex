@@ -97,14 +97,14 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
                     lastIndex=rds.gearIndex;
                 } else {
                     valueArea.setColor(colorMode.getFieldColor(:error));
-                    setTextValue("Inv.");
+                    setTextValue("--");
                     teethsLabel.setText("");
                     lastIndex=-1;
                 }
         } else {
             teethsLabel.setText(".");
             valueArea.setColor(colorMode.getFieldColor(:error));
-            setTextValue("..");
+            setTextValue("xx");
             lastIndex=-2;
         }
     }

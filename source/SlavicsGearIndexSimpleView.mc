@@ -39,11 +39,11 @@ class SlavicsGearIndexSimpleView extends WatchUi.SimpleDataField {
                 if(ss.rearDerailleur.gearIndex!=AntPlus.REAR_GEAR_INVALID){    
                     return (ss.rearDerailleur.gearIndex+1).toString();
                 } else {
-                    return "xx";
+                    return "--";
                 }
                 //return System.getClockTime().sec.toString()+Application.loadResource(Rez.Strings.unitTeeth);
         } else {
-            return "--";
+            return "xx";
         }
     }
 
