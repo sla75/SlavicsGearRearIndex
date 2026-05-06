@@ -28,7 +28,6 @@ class ColorMode {
                 :valueEdge=>Graphics.COLOR_DK_RED,
                 :valueChange=>Graphics.COLOR_DK_GRAY,
                 :error=>Graphics.COLOR_LT_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             },:night=>{
                 :background=>Graphics.COLOR_BLACK,
                 :label=>Graphics.COLOR_LT_GRAY,
@@ -36,7 +35,6 @@ class ColorMode {
                 :valueEdge=>Graphics.COLOR_RED,
                 :valueChange=>Graphics.COLOR_LT_GRAY,
                 :error=>Graphics.COLOR_DK_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
     private const MODE_BLUE={:day=>{
@@ -46,7 +44,6 @@ class ColorMode {
                 :valueEdge=>Graphics.COLOR_DK_RED,
                 :valueChange=>Graphics.COLOR_LT_GRAY,
                 :error=>Graphics.COLOR_LT_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
     private const MODE_GREEN={:day=>{
@@ -56,7 +53,6 @@ class ColorMode {
                 :valueEdge=>Graphics.COLOR_DK_RED,
                 :valueChange=>Graphics.COLOR_LT_GRAY,
                 :error=>Graphics.COLOR_DK_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
     private const MODE_PINK={:day=>{
@@ -66,7 +62,6 @@ class ColorMode {
                 :valueEdge=>Graphics.COLOR_DK_RED,
                 :valueChange=>Graphics.COLOR_DK_GRAY,
                 :error=>Graphics.COLOR_LT_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             },:night=>{
                 :background=>Graphics.COLOR_PURPLE,
                 :label=>Graphics.COLOR_LT_GRAY,
@@ -74,7 +69,6 @@ class ColorMode {
                 :valueEdge=>Graphics.COLOR_RED,
                 :valueChange=>Graphics.COLOR_LT_GRAY,
                 :error=>Graphics.COLOR_DK_GRAY,
-                :batteryName=>Graphics.COLOR_BLACK,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
     private var colors=MODE_BLACKANDWHITE as Dictionary<Symbol,Graphics.ColorValue>;

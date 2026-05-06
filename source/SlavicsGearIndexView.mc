@@ -135,8 +135,8 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
 
     }
     var battIcon=new BatteryIcon({:font=>WatchUi.loadResource(Rez.Fonts.BatteryMedium),:justification=>Graphics.TEXT_JUSTIFY_RIGHT});
-    var battFontS=Graphics.FONT_TINY;
-    //var battFontM=Graphics.FONT_SMALL;
+    var battFont=Graphics.FONT_TINY;
+
     public function onUpdate(dc as Dc) as Void {
         System.println("SlavicsGearRearView.onUpdate()");
         SlavicsSimpleDataField.onUpdate(dc);
@@ -152,32 +152,19 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
             battIcon.locY=dc.getHeight()-rim-Graphics.getFontAscent(battIcon.getFont());
             for(var i=0;i<batteries.size();i++){
                 var bd=(batteries as Array<RearShifting.BatteryData>)[i] as RearShifting.BatteryData;
-                // Horizontaly
-                if(false && bd.get(:batteryStatus)>3) {
-                    dc.setColor(colorMode.getFieldColor(:batteryName),Graphics.COLOR_TRANSPARENT);
-                    dc.drawText(bLocX,bLocY,battFontS,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
-                    bLocX-=dc.getTextWidthInPixels(bd.get(:name),battFontS)+3;
-                    //dc.drawText(bLocX,bLocY+Graphics.getFontAscent(battFontS)-Graphics.getFontAscent(battFontM),battFontM,bd.get(:percentage),Graphics.TEXT_JUSTIFY_RIGHT);
-                    //bLocX-=dc.getTextWidthInPixels(bd.get(:percentage),battFontM)+3;
-                }
                 // Vertically
-                if(true && bd.get(:batteryStatus)>0) {
-                    bLocX=dc.getWidth()-rim;
+                if(bd.get(:batteryStatus)>0) {
 
                     battIcon.locX=bLocX;
-                    //battIcon.locY=bLocY+Graphics.getFontAscent(battIcon.getFont())-Graphics.getFontAscent(battFontS);
                     battIcon.locY=bLocY;
                     battIcon.compute(bd.get(:batteryStatus),false);
                     battIcon.draw(dc);
-                    
-                    bLocX-=dc.getTextWidthInPixels("0",battIcon.getFont())+3;
-                    var cLocY=bLocY+(Graphics.getFontAscent(battIcon.getFont())-Graphics.getFontAscent(battFontS))/2;
 
-                    dc.setColor(colorMode.getFieldColor(:batteryName),Graphics.COLOR_TRANSPARENT);
-                    dc.drawText(bLocX,cLocY,battFontS,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
-                    
-                    //dc.drawText(bLocX,bLocY+Graphics.getFontAscent(battFontS)-Graphics.getFontAscent(battFontM),battFontM,bd.get(:percentage),Graphics.TEXT_JUSTIFY_RIGHT);
-
+                    dc.setColor(colorMode.getFieldColor(:label),Graphics.COLOR_TRANSPARENT);
+                    dc.drawText(
+                        bLocX-battIcon.getWidth(dc)-3,
+                        bLocY+(Graphics.getFontAscent(battIcon.getFont())-Graphics.getFontAscent(battFont))/2,
+                        battFont,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
                     
                     bLocY-=Graphics.getFontHeight(battIcon.getFont())+3;
                 }
