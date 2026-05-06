@@ -27,14 +27,14 @@ class ColorMode {
                 :value=>Graphics.COLOR_BLACK,
                 :valueEdge=>Graphics.COLOR_DK_RED,
                 :valueChange=>Graphics.COLOR_DK_GRAY,
-                :error=>Graphics.COLOR_LT_GRAY,
+                :error=>Graphics.COLOR_DK_RED,
             },:night=>{
                 :background=>Graphics.COLOR_BLACK,
                 :label=>Graphics.COLOR_LT_GRAY,
                 :value=>Graphics.COLOR_WHITE,
                 :valueEdge=>Graphics.COLOR_RED,
                 :valueChange=>Graphics.COLOR_LT_GRAY,
-                :error=>Graphics.COLOR_DK_GRAY,
+                :error=>Graphics.COLOR_RED,
             }
         } as Dictionary<Dictionary<Symbol,Graphics.ColorValue>>;
     private const MODE_BLUE={:day=>{

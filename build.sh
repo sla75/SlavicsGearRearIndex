@@ -9,6 +9,8 @@ echo_and_exec() {
     "$@"
 }
 
+rm -rf bin/
+
 SDK="$(cat "${HOME}/.Garmin/ConnectIQ/current-sdk.cfg")"
 # edit the following line to point to your developer key
 
@@ -32,8 +34,8 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMITS=$(git rev-list --count --since="$(date +'%+4Y-%m-01')" --all)
 BUILD=${CURRENT_VERSION}"."$(date +'%+y%m')"."${COMMITS}${SYSTEM}
 VERSION=$(xmllint --xpath "//strings/string[@id='version']/text()" resources/strings/strings.xml)
-echo "  Version=${VERSION}"
-echo "GIT Build=${BUILD}"
+echo "Version=${VERSION}"
+#echo "GIT Build=${BUILD}"
 
 #OLDBUILD="${VERSION##*.}"
 #VERSION=${VERSION%.*}
@@ -74,13 +76,16 @@ echo "Set AppName=${PROJECT_NAME}${SYSTEM}"
 
 echo -e "\nGenerate ${PROJECT_NAME}-${BUILD}${SYSTEM}..."
 DEV_KEY="${HOME}/.Garmin/ConnectIQ/developer_key.der"
-echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
-    -jar "${SDK}"bin/monkeybrains.jar \
-    --output "bin/${PROJECT_NAME}-${BUILD}${SYSTEM}.iq"    \
-    --jungles "monkey.jungle" \
-    --private-key ${DEV_KEY}    \
-    --package-app --release --warn
-echo -e "Generated bin/${PROJECT_NAME}-${BUILD}.iq"
+
+if [[ -z ${1} ]]; then
+    echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
+        -jar "${SDK}"bin/monkeybrains.jar \
+        --output "bin/${PROJECT_NAME}-${BUILD}${SYSTEM}.iq"    \
+        --jungles "monkey.jungle" \
+        --private-key ${DEV_KEY}    \
+        --package-app --release --warn
+    echo -e "Generated bin/${PROJECT_NAME}-${BUILD}.iq"
+fi;
 
 DEVICE=${1:-edge1050}
 OUTPUT_FILE="bin/${PROJECT_NAME}-${BUILD}_${DEVICE}.prg"

@@ -12,6 +12,13 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     public static const BATTERY_STATUS_TEXT = ["0","New","Good","Ok","Low","Crit.","Unkn.","Inv.","Cnt"] as Array<String>;
     private var rearShift=new RearShifting() as RearShifting;
     private var batteries=[] as Array<RearShifting.BatteryData>;
+    private const INVALID_SHIFTS=[:shiftFailureCount,:invalidInboardShiftCount,:invalidOutboardShiftCount] as Array<Symbol>;
+    private var fails={
+            INVALID_SHIFTS[0]=>{:count=>0,:change=>false},
+            INVALID_SHIFTS[1]=>{:count=>0,:change=>false},
+            INVALID_SHIFTS[2]=>{:count=>0,:change=>false},
+        } as Dictionary<Symbol,Dictionary<Symbol,Object>>;
+    
     
     private var teethsLabel=new Text({
             :color=>Graphics.COLOR_DK_GRAY,
@@ -24,10 +31,9 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
             :font=>Graphics.FONT_SMALL,
             :justification=>Graphics.TEXT_JUSTIFY_LEFT,
         });
-    private var oldFailLabel="" as String;
-    private var failTime=3 as Number;
+    private const FAIL_TIME_COUNTER=10 as Number;
+    private var failTime=FAIL_TIME_COUNTER as Number;
     private var unitTeeths as String;
-    private var label as String;
     private var lastIndex=-1 as Number;
     private var colorMode as ColorMode;
 
@@ -35,7 +41,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         System.println("SlavicsGearRearView.initialize()");
         SlavicsSimpleDataField.initialize();
         unitTeeths=Application.loadResource(Rez.Strings.unitTeeths);
-        label=Application.loadResource(Rez.Strings.label);
+        self.setTextLabel(Application.loadResource(Rez.Strings.label));
         Properties.setValue("property_version",Application.loadResource(Rez.Strings.version));
         Properties.setValue("property_showteeth",Properties.getValue("property_showteeth")==null?true:Properties.getValue("property_showteeth") as Boolean);
         colorMode=new ColorMode();
@@ -47,7 +53,6 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         SlavicsSimpleDataField.onLayout(dc);
         teethsLabel.locX=self.rim;
         teethsLabel.locY=self.labelLine;
-        failLabel.locX=rim;
         failLabel.locY=dc.getHeight()-Graphics.getFontAscent(Graphics.FONT_SMALL)-rim;
         /***
         System.println("PartNumber: "+System.getDeviceSettings().partNumber);
@@ -77,11 +82,12 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         SlavicsSimpleDataField.compute(info);
         colorMode.compute();
         SlavicsSimpleDataField.setColors(colorMode.getColors());
+        /***
         var bsds=rearShift.getDeviceState() as AntPlus.DeviceState;
         if(bsds!=null&&bsds.state!=null){
             switch(bsds.state){
                 case AntPlus.DEVICE_STATE_SEARCHING:
-                    self.setTextLabel(System.getClockTime().sec%2==0?" ."+label+". ":".."+label+"..");
+                    self.labelArea.setColor(System.getClockTime().sec%2==0?" ."+label+". ":".."+label+"..");
                     break;
                 case AntPlus.DEVICE_STATE_TRACKING:
                     self.setTextLabel(label);
@@ -89,8 +95,9 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
                 default:
                     self.setTextLabel("?"+label+"?");
             }
-            batteries=rearShift.getBatteries() as Array<RearShifting.BatteryData>;
         }
+        /***/
+        batteries=rearShift.getBatteries() as Array<RearShifting.BatteryData>;
 
         var rds=rearShift.getRearDerailleurStatus() as AntPlus.DerailleurStatus;
         teethsLabel.setColor(colorMode.getFieldColor(:label));
@@ -111,25 +118,44 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
                     lastIndex=-1;
                 }
         } else {
-            teethsLabel.setText(".");
+            teethsLabel.setText("");
             valueArea.setColor(colorMode.getFieldColor(:error));
             setTextValue("xx");
             lastIndex=-2;
         }
+        for(var j=0;j<INVALID_SHIFTS.size();j++){
+            var count=0;
+            switch(j){
+                case 0:
+                    count=rds.shiftFailureCount;
+                    break;
+                case 1:
+                    count=rds.invalidInboardShiftCount;
+                    break;
+                case 2:
+                    count=rds.invalidOutboardShiftCount;
+                    break;
+            }
+            if(fails.get(INVALID_SHIFTS[j]).get(:count)!=count){
+                fails.get(INVALID_SHIFTS[j]).put(:count,count);
+                fails.get(INVALID_SHIFTS[j]).put(:change,true);
+                failTime=FAIL_TIME_COUNTER;
+                failLabel.setVisible(true);
+                System.println("FAIL start fail["+j+"]="+rds.shiftFailureCount);
+            }
+        }
 
-        var fl=rds.invalidInboardShiftCount+"/"+rds.invalidOutboardShiftCount+"/"+rds.shiftFailureCount;
-        if(!fl.equals(oldFailLabel)){
-            System.println("FAIL shift="+fl+" ft="+failTime);
-            failLabel.setText(fl);
-            failLabel.setVisible(true);
-            failTime=3;
-            oldFailLabel=fl;
-        } else if(failTime>=0){
-            System.println("FAIL failTime="+failTime);
+        if(failTime>=0){
             if(failTime>0){
+                System.println("FAIL countDown failTime="+failTime);
                 failTime--;
             } else {
+                failTime=-1;
+                System.println("FAIL end");
                 failLabel.setVisible(false);
+                for(var j=0;j<INVALID_SHIFTS.size();j++){
+                    fails.get(INVALID_SHIFTS[j]).put(:change,false);
+                }
             }
         }
 
@@ -140,9 +166,6 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     public function onUpdate(dc as Dc) as Void {
         System.println("SlavicsGearRearView.onUpdate()");
         SlavicsSimpleDataField.onUpdate(dc);
-        if(Properties.getValue("property_showfailure") as Boolean){
-            failLabel.draw(dc);
-        }
         teethsLabel.draw(dc);
         //var FBT=WatchUi.loadResource(Rez.Fonts.BatterySmall);
         //b.setFont(FBT);
@@ -202,6 +225,24 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
             dc.drawText(bLocX,bLocY,battIcon.getFont(),"01023456",Graphics.TEXT_JUSTIFY_RIGHT);
             //bLocX-=dc.getTextWidthInPixels(bd.get(:name)+" ",Graphics.FONT_XTINY);
             /***/
+        }
+        if(Properties.getValue("property_showfailure") as Boolean && failLabel.isVisible){
+            for(var j=0;j<INVALID_SHIFTS.size();j++){
+                if(j==0){
+                    failLabel.locX=rim;
+                } else {
+                    failLabel.locX+=dc.getTextWidthInPixels("/",Graphics.FONT_SMALL);
+                }
+                failLabel.setColor(fails.get(INVALID_SHIFTS[j]).get(:change)?colorMode.getFieldColor(:error):colorMode.getFieldColor(:label));
+                failLabel.setText(fails.get(INVALID_SHIFTS[j]).get(:count).toString());
+                failLabel.draw(dc);
+                if(j<2){
+                    failLabel.locX+=dc.getTextWidthInPixels(fails.get(INVALID_SHIFTS[j]).get(:count).toString(),Graphics.FONT_SMALL);
+                    failLabel.setColor(colorMode.getFieldColor(:label));
+                    failLabel.setText("/");
+                    failLabel.draw(dc);
+                }
+            }
         }
     }
 }
