@@ -5,7 +5,7 @@
         <property id="property_showteeth" type="boolean">true</property>
         <property id="property_nightMode" type="boolean">false</property>
         <property id="property_colorMode" type="number">0</property>
-        <property id="property_showfailure" type="boolean">false</property>
+        <property id="property_showfailure" type="boolean">true</property>
     </properties>
 
     <settings>

@@ -56,7 +56,7 @@ class SlavicsSimpleDataField extends WatchUi.DataField {
         //valueArea.locY=labelLine-rim;
         valueArea.locY=labelArea.locY+labelArea.height/2;
         valueArea.width=dc.getWidth()-2*rim;
-        valueArea.height=dc.getHeight()-valueArea.locY-rim;
+        valueArea.height=dc.getHeight()-valueArea.locY;
 
     }
 
