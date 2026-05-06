@@ -62,7 +62,7 @@ else
     fi
 fi
 echo "Set AppName=${PROJECT_NAME}${SYSTEM}"
-echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME}${SYSTEM}\nsave\nbye" | xmllint --shell resources/strings/strings.xml | grep -v ">"
+#echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME}${SYSTEM}\nsave\nbye" | xmllint --shell resources/strings/strings.xml | grep -v ">"
 
 #echo -ne "2. APP_ID="
 #echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncat //iq:manifest/iq:application/@id" | xmllint --shell manifest.xml | grep -v ">" | cut -f 2 -d "=" | tr -d \"
@@ -80,10 +80,10 @@ echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"  
     --jungles "monkey.jungle" \
     --private-key ${DEV_KEY}    \
     --package-app --release --warn
-echo -e "Generated bin/${PROJECT_NAME}-${BUILD}${SYSTEM}.iq"
+echo -e "Generated bin/${PROJECT_NAME}-${BUILD}.iq"
 
 DEVICE=${1:-edge1050}
-OUTPUT_FILE="bin/${PROJECT_NAME}-${BUILD}${SYSTEM}_${DEVICE}.prg"
+OUTPUT_FILE="bin/${PROJECT_NAME}-${BUILD}_${DEVICE}.prg"
 
 #if [[ $1 == "" ]]; then
 #    >&2 echo Usage: ciq-release.sh [device]
