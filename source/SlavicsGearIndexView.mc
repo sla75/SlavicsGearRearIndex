@@ -195,6 +195,33 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
                 }
             }
             /***
+            bLocX=rim+5;
+            var tt="001122";
+            var bFont=WatchUi.loadResource(Rez.Fonts.BatteryMedium);
+            var bM=dc.getTextDimensions(tt,bFont);
+
+            dc.setColor(Graphics.COLOR_BLUE,Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(bLocX-3,bLocY,bLocX+bM[0]+3,bLocY);
+            dc.drawLine(bLocX,bLocY-3,bLocX,bLocY+bM[1]+3);
+            dc.drawLine(bLocX-3,bLocY+Graphics.getFontAscent(bFont),bLocX+bM[0]+3,bLocY+Graphics.getFontAscent(bFont));
+            dc.drawLine(bLocX-3,bLocY+Graphics.getFontHeight(bFont),bLocX+bM[0]+3,bLocY+Graphics.getFontHeight(bFont));
+
+            dc.setColor(Graphics.COLOR_DK_BLUE,Graphics.COLOR_LT_GRAY);
+            dc.drawText(bLocX,bLocY,bFont,tt,Graphics.TEXT_JUSTIFY_LEFT);
+
+            bLocX+=bM[0]+1;
+            bM=dc.getTextDimensions(tt,Graphics.FONT_MEDIUM);
+            dc.setColor(Graphics.COLOR_RED,Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(bLocX-3,bLocY,bLocX+bM[0]+3,bLocY);
+            dc.drawLine(bLocX,bLocY-3,bLocX,bLocY+bM[1]+3);
+            dc.drawLine(bLocX-3,bLocY+Graphics.getFontAscent(Graphics.FONT_MEDIUM),bLocX+bM[0]+3,bLocY+Graphics.getFontAscent(Graphics.FONT_MEDIUM));
+            dc.drawLine(bLocX-3,bLocY+Graphics.getFontHeight(Graphics.FONT_MEDIUM),bLocX+bM[0]+3,bLocY+Graphics.getFontHeight(Graphics.FONT_MEDIUM));
+
+            dc.setColor(Graphics.COLOR_DK_RED,Graphics.COLOR_LT_GRAY);
+            dc.drawText(bLocX,bLocY,Graphics.FONT_MEDIUM,tt,Graphics.TEXT_JUSTIFY_LEFT);
+
+            
+            /***
             battIcon.locX=bLocX;
             battIcon.compute(AntPlus.BATT_STATUS_NEW,true);
             battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;

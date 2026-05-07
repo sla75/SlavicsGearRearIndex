@@ -28,14 +28,14 @@ class BatteryIcon extends Drawable {
             ] as Array<BatteryStatusValue>;
     private static const BATCHAR={
             0=>"0",
-            AntPlus.BATT_STATUS_NEW=>"0",
-            AntPlus.BATT_STATUS_GOOD=>"1",
-            AntPlus.BATT_STATUS_OK=>"2",
-            AntPlus.BATT_STATUS_LOW=>"3",
-            AntPlus.BATT_STATUS_CRITICAL=>"4",
-            6=>"0",
-            AntPlus.BATT_STATUS_INVALID=>"5",
-            AntPlus.BATT_STATUS_CNT=>"5",
+            AntPlus.BATT_STATUS_NEW=>"1",
+            AntPlus.BATT_STATUS_GOOD=>"2",
+            AntPlus.BATT_STATUS_OK=>"3",
+            AntPlus.BATT_STATUS_LOW=>"4",
+            AntPlus.BATT_STATUS_CRITICAL=>"5",
+            6=>"7",
+            AntPlus.BATT_STATUS_INVALID=>"6",
+            AntPlus.BATT_STATUS_CNT=>"6",
         };
 
     public function setFont(font as Graphics.FontType) as Void{
@@ -54,17 +54,17 @@ class BatteryIcon extends Drawable {
     public function draw(dc as Dc) {
 
         //Shadow
-        dc.setColor(Graphics.COLOR_DK_GRAY,Graphics.COLOR_TRANSPARENT);
-        dc.drawText(self.locX+1,self.locY+1,fontBattery,BATCHAR.get(status),self.justify);
         dc.setColor(Graphics.COLOR_LT_GRAY,Graphics.COLOR_TRANSPARENT);
-        dc.drawText(self.locX-1,self.locY-1,fontBattery,BATCHAR.get(status),self.justify);
+        dc.drawText(self.locX+1,self.locY-1,fontBattery,"0",self.justify);
+        dc.setColor(Graphics.COLOR_LT_GRAY,Graphics.COLOR_TRANSPARENT);
+        dc.drawText(self.locX-1,self.locY+1,fontBattery,"0",self.justify);
         
         // Own Battery Icon
         dc.setColor(BATTERY_STATUS_COLOR[status],Graphics.COLOR_TRANSPARENT);
         dc.drawText(self.locX,self.locY,fontBattery,BATCHAR.get(status),self.justify);
         if(charge){
             dc.setColor(Graphics.COLOR_RED,Graphics.COLOR_TRANSPARENT);
-            dc.drawText(self.locX,self.locY,fontBattery,"6",self.justify);
+            dc.drawText(self.locX,self.locY,fontBattery,"7",self.justify);
         }
     }
     
