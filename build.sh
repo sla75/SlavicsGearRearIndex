@@ -9,7 +9,7 @@ echo_and_exec() {
     "$@"
 }
 
-rm -rvf bin/
+rm -rf bin/ && echo "Deleted bin/"
 
 SDK="$(cat "${HOME}/.Garmin/ConnectIQ/current-sdk.cfg")"
 # edit the following line to point to your developer key
@@ -32,19 +32,29 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 #BUILD=$(git rev-list HEAD --count)
 # Commits this month
 COMMITS=$(git rev-list --count --since="$(date +'%+4Y-%m-01')" --all)
-BUILD=${CURRENT_VERSION}"."$(date +'%+y%m')"."${COMMITS}${SYSTEM}
+
+if [ -z ${SYSTEM} ];  then
+    BUILD=${CURRENT_VERSION}"."$(date +'%+y%m')"."$(git rev-list --count --since="$(date +'%+4Y-%m-01')" --all)
+else 
+    BUILD=${CURRENT_VERSION}".${BRANCH}."$(git rev-list --no-merges --count HEAD ^${BRANCH})
+    echo "BUILD=${BUILD}"
+fi;
+
+
+
+[[ ${BRANCH} == "main" ]] && BRANCH=""
 VERSION=$(xmllint --xpath "//strings/string[@id='version']/text()" resources/strings/strings.xml)
 echo "Version=${VERSION}"
-#echo "GIT Build=${BUILD}"
+echo "GIT Build=${BUILD}"
 
 #OLDBUILD="${VERSION##*.}"
 #VERSION=${VERSION%.*}
 #VERSION=${VERSION}.${BUILD}
 #echo "    GIT Build=${OLDBUILD}"
 #echo "Version Build=${OLDBUILD}"
-if [[ "${VERSION}" != "${BUILD}" ]]; then
-    echo "Set version=${BUILD}"
-    echo -e "cd /strings/string[@id=\"version\"]\nset ${BUILD}\nsave" | xmllint --shell resources/strings/strings.xml
+if [[ "${VERSION}" != "${BUILD}${SYSTEM}" ]]; then
+    echo "Set version=${BUILD}${SYSTEM}"
+    echo -e "cd /strings/string[@id=\"version\"]\nset ${BUILD}${SYSTEM}\nsave" | xmllint --shell resources/strings/strings.xml
 fi
 #xmllint --xpath "//strings/string[@id='version']/text()" resources/strings/strings.xml
 
@@ -63,8 +73,8 @@ else
         echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncd //iq:manifest/iq:application/@id\nset ${APP_PROD_ID}\nsave\nbye" | xmllint --shell manifest.xml
     fi
 fi
-echo "Set AppName=${PROJECT_NAME}${SYSTEM}"
-echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME} ${BUILD}${SYSTEM}\nsave\nbye" | xmllint --shell resources/strings/strings.xml
+echo "Set AppName=${PROJECT_NAME} ${BUILD}"
+echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME} ${BUILD}\nsave\nbye" | xmllint --shell resources/strings/strings.xml
 
 #echo -ne "2. APP_ID="
 #echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncat //iq:manifest/iq:application/@id" | xmllint --shell manifest.xml | grep -v ">" | cut -f 2 -d "=" | tr -d \"
@@ -74,13 +84,13 @@ echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME} ${BUILD}${SYS
 
 #BUILD=$(git rev-list --count --all)
 
-echo -e "\nGenerate ${PROJECT_NAME}-${BUILD}${SYSTEM}..."
+echo -e "\nGenerate ${PROJECT_NAME}-${BUILD}..."
 DEV_KEY="${HOME}/.Garmin/ConnectIQ/developer_key.der"
 
 if [[ -z ${1} ]]; then
     echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
         -jar "${SDK}"bin/monkeybrains.jar \
-        --output "bin/${PROJECT_NAME}-${BUILD}${SYSTEM}.iq"    \
+        --output "bin/${PROJECT_NAME}-${BUILD}.iq"    \
         --jungles "monkey.jungle" \
         --private-key ${DEV_KEY}    \
         --package-app --release --warn

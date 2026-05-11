@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <string id="AppName" translatable="false">SlavicGearIndexTest</string>
-    <string id="version" translatable="false">1.2605.22Test</string>
+    <string id="AppName" translatable="false">SlavicGearIndex 1.iss2.0</string>
+    <string id="version" translatable="false">1.iss2.0Test</string>
     <string id="label">Derailleur</string>
     <string id="unitTeeths">t</string>
 
