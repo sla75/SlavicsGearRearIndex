@@ -47,17 +47,15 @@ class SlavicsSimpleDataField extends WatchUi.DataField {
         rim=dc.getHeight()*0.02f;
         labelLine=dc.getHeight()*LABELHEIGHT;
 
-        labelArea.locX=rim;
+        labelArea.locX=0;
         labelArea.locY=rim;
-        labelArea.width=dc.getWidth()-2*rim;
-        labelArea.height=labelLine+rim;
+        labelArea.width=dc.getWidth();
+        labelArea.height=labelLine*1.333f;
 
-        valueArea.locX=rim;
-        //valueArea.locY=labelLine-rim;
-        valueArea.locY=labelArea.locY+labelArea.height/2;
-        valueArea.width=dc.getWidth()-2*rim;
-        valueArea.height=dc.getHeight()-valueArea.locY;
-
+        valueArea.locX=0;
+        valueArea.locY=labelLine;
+        valueArea.width=dc.getWidth();
+        valueArea.height=dc.getHeight()-labelLine*0.667f;
     }
 
     public function setTextLabel(text as String or Null){
