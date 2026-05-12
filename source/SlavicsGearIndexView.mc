@@ -34,7 +34,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     private const FAIL_TIME_COUNTER=10 as Number;
     private var failTime=FAIL_TIME_COUNTER as Number;
     private var unitTeeths as String;
-    private var versionTest=false as Boolean;
+    private var versionTest=null as String;
     private var lastIndex=-1 as Number;
     private var colorMode as ColorMode;
 
@@ -42,8 +42,9 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         System.println("SlavicsGearRearView.initialize()");
         SlavicsSimpleDataField.initialize();
         unitTeeths=Application.loadResource(Rez.Strings.unitTeeths);
-        if(Application.loadResource(Rez.Strings.version).find("Test")!=null){
-            versionTest=true;
+        var pos=Application.loadResource(Rez.Strings.version).find("Test") as Number or Null;
+        if(pos!=null){
+            versionTest=Application.loadResource(Rez.Strings.version).toString().substring(0, pos);
         }
         self.setTextLabel(Application.loadResource(Rez.Strings.label));
         Properties.setValue("property_version",Application.loadResource(Rez.Strings.version));
@@ -169,9 +170,9 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     public function onUpdate(dc as Dc) as Void {
         System.println("SlavicsGearRearView.onUpdate()");
         SlavicsSimpleDataField.onUpdate(dc);
-        if(versionTest){
+        if(versionTest!=null){
             dc.setColor(Graphics.COLOR_YELLOW,Graphics.COLOR_TRANSPARENT);
-            dc.drawText(1,1,Graphics.FONT_XTINY,"x",Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(1,1,Graphics.FONT_XTINY,versionTest,Graphics.TEXT_JUSTIFY_LEFT);
         }
         teethsLabel.draw(dc);
         //var FBT=WatchUi.loadResource(Rez.Fonts.BatterySmall);
