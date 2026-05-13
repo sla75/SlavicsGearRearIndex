@@ -71,7 +71,7 @@ fi;
 
 echo -e "\n****************************************\nBUILD ${APP_NAME} ${APP_VERSION}.${BRANCH}.${GITCOUNT}\n----------------------------------------"
 
-if [[ -n ${SYSTEM} ]]; then
+if [[ -z ${SYSTEM} ]]; then
     find bin/ -type f -name "${APP_NAME}-*.iq" -exec rm {} \;
     echo -e "\nGenerate ${APP_NAME}-${GITCOUNT}..."
     echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
@@ -83,7 +83,28 @@ if [[ -n ${SYSTEM} ]]; then
     echo -e "Generated bin/${APP_NAME}-${GITCOUNT}.iq"
 fi;
 
+declare -a devices=("edge840" "edge1050")
 
+if [[ -n "${1}" ]]; then
+    devices=("${1}")
+fi;
+
+JUNGLEPATHS="${PWD}/monkey.jungle"
+## loop through above array (quotes are important if your elements may contain spaces)
+for device in "${devices[@]}"
+do
+    echo "Device: ${device}"
+    find bin/ -type f -name "${APP_NAME}-${device^}-*.prg*" -exec rm {} \;
+    [[ -e "${PWD}/barrels.jungle" ]] && JUNGLEPATHS="${JUNGLEPATHS};${PWD}/barrels.jungle"
+    echo_and_exec "${SDK}"bin/monkeyc \
+        --private-key "${DEV_KEY}" --jungles "${JUNGLEPATHS}" \
+        --device ${device} --output "bin/${APP_NAME}-${device^}-${APP_VERSION}.${BRANCH}.${GITCOUNT}.prg" \
+        --warn --typecheck 1 --release
+        # --debug-log-output logs/monkeyc.zip --debug-log-level 3 
+    # echo_and_exec "${SDK}"/bin/monkeydo "${OUTPUT_FILE}" ${DEVICE}
+    echo -e "Generated ${OUTPUT_FILE}"
+   
+done
 
 echo -e "########################################\n"
 
