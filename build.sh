@@ -1,32 +1,26 @@
 #!/usr/bin/env bash
 
-CURRENT_VERSION=1
-
-
-
 echo_and_exec() {
     echo "> $@"
     "$@"
 }
 
-
-
-
-
-
-
 #rm -rf bin/ && echo "Deleted bin/"
-
+DEV_KEY="${HOME}/.Garmin/ConnectIQ/developer_key.der"
 SDK="$(cat "${HOME}/.Garmin/ConnectIQ/current-sdk.cfg")"
 # edit the following line to point to your developer key
 
-PROJECT_FOLDER=${PWD}
-PROJECT_NAME=$(basename "${PROJECT_FOLDER}")
-PROJECT_NAME="SlavicGearIndex"
-APP_STRING=resources/strings/app.xml
+APP_FILE=resources/strings/app.xml
+APP_NAME=$(xmllint --xpath "//strings/string[@id='AppName']/text()" ${APP_FILE})
+APP_VERSION=$(xmllint --xpath "//strings/string[@id='version']/text()" ${APP_FILE})
 
-APP_TEST_ID="c4755d9c-e9e1-4924-b458-04e708ce9999"
-APP_PROD_ID="c4755d9c-e9e1-4924-b458-04e708ce0000"
+PROJECT_FOLDER=${PWD}
+#PROJECT_NAME=$(basename "${PROJECT_FOLDER}")
+#PROJECT_NAME="SlavicGearIndex"
+
+
+#APP_TEST_ID="c4755d9c-e9e1-4924-b458-04e708ce9999"
+#APP_PROD_ID="c4755d9c-e9e1-4924-b458-04e708ce0000"
 
 SYSTEM="Test"
 # Branch name
@@ -51,18 +45,34 @@ if [[ ${SYSTEM} == "Test" ]]; then
     APP_ID_TEST=${APP_ID::-4}"9999"
     echo "  Write Application@id=${APP_ID_TEST}"
     echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncd //iq:manifest/iq:application/@id\nset ${APP_ID_TEST}\nsave\nbye" | xmllint --shell manifest.xml | grep -v ">" 
-    GITCOUNT=$(git rev-list --count HEAD ^${BRANCH})
+    GITCOUNT=$(git rev-list --count --first-parent main..${BRANCH})
+
+    echo "Set AppName=${APP_NAME} ${APP_VERSION}.${BRANCH}.${GITCOUNT}"
+    echo -e "cd /strings/string[@id=\"AppName\"]\nset ${APP_NAME} ${APP_VERSION}.${BRANCH}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
+    echo "Set version=${APP_VERSION}.${BRANCH}.${GITCOUNT}"
+    echo -e "cd /strings/string[@id=\"version\"]\nset ${APP_VERSION}.${BRANCH}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
 else
     # Main count of commits without merges
     GITCOUNT=$(git rev-list --no-merges --count HEAD )
+    echo "Set AppName=${APP_NAME} ${APP_VERSION}.${GITCOUNT}"
+    echo -e "cd /strings/string[@id=\"AppName\"]\nset ${APP_NAME} ${APP_VERSION}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
+    echo "Set version=${APP_VERSION}.${GITCOUNT}"
+    echo -e "cd /strings/string[@id=\"version\"]\nset ${APP_VERSION}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
 fi;
-echo -ne "\n**********\n\nBUILD in branch '${BRANCH}' on ${GITCOUNT} commits.\n\n##########\n"
 
+#xmllint --xpath "/strings/string[@id='AppName']/text()" ${APP_FILE}
+#xmllint --xpath "/strings/string[@id='version']/text()" ${APP_FILE}
+
+
+echo -e "\n****************************************\nBUILD ${APP_NAME} ${APP_VERSION}.${BRANCH/main/}.${GITCOUNT}\n----------------------------------------"
+
+
+echo -e "########################################\n"
 
 if [[ ${SYSTEM} == "Test" ]]; then
-    echo "RESTORE Application@id=${APP_ID} in manifest.xml"
-    git restore --staged manifest.xml
-    git restore manifest.xml
+    echo "RESTORE Application@id=${APP_ID} in manifest.xml and ${APP_FILE}"
+    git restore --staged manifest.xml ${APP_FILE}
+    git restore manifest.xml ${APP_FILE}
 fi
 
 
@@ -74,6 +84,8 @@ fi
 set -e # halt on error
 exit;
 
+
+#####################################################################################################################################################################################ššššš
 # Revert change on version
 #git checkout -- resources/strings/strings.xml manifest.xml
 
@@ -107,20 +119,7 @@ fi
 #xmllint --xpath "//strings/string[@id='version']/text()" resources/strings/strings.xml
 
 
-APP_ID=$(echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncat //iq:manifest/iq:application/@id" | xmllint --shell manifest.xml | grep -v ">" | cut -f 2 -d "=" | tr -d \");
-#echo -e "\n1. APP_ID=${APP_ID}"
 
-if [ "${SYSTEM}" == "Test" ]; then
-    if [ ${APP_ID} != ${APP_TEST_ID} ]; then
-        echo "Write APP_TEST_ID=${APP_TEST_ID}"
-        echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncd //iq:manifest/iq:application/@id\nset ${APP_TEST_ID}\nsave\nbye" | xmllint --shell manifest.xml
-    fi
-else
-    if [ ${APP_ID} != ${APP_PROD_ID} ]; then
-        echo "Write APP_PROD_ID=${APP_PROD_ID}"
-        echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncd //iq:manifest/iq:application/@id\nset ${APP_PROD_ID}\nsave\nbye" | xmllint --shell manifest.xml
-    fi
-fi
 echo "Set AppName=${PROJECT_NAME} ${BUILD}"
 echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME} ${BUILD}\nsave\nbye" | xmllint --shell ${APP_STRING}
 
@@ -133,7 +132,7 @@ echo -e "cd //strings/string[@id=\"AppName\"]\nset ${PROJECT_NAME} ${BUILD}\nsav
 #BUILD=$(git rev-list --count --all)
 
 echo -e "\nGenerate ${PROJECT_NAME}-${BUILD}..."
-DEV_KEY="${HOME}/.Garmin/ConnectIQ/developer_key.der"
+
 
 if [[ -z ${1} ]]; then
     echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
