@@ -5,6 +5,8 @@ echo_and_exec() {
     "$@"
 }
 
+#set -e # halt on error
+
 #rm -rf bin/ && echo "Deleted bin/"
 DEV_KEY="${HOME}/.Garmin/ConnectIQ/developer_key.der"
 SDK="$(cat "${HOME}/.Garmin/ConnectIQ/current-sdk.cfg")"
@@ -48,9 +50,10 @@ if [[ ${SYSTEM} == "Test" ]]; then
     echo "  Write Application@id=${APP_ID_TEST}"
     echo -e "setns iq=http://www.garmin.com/xml/connectiq\ncd //iq:manifest/iq:application/@id\nset ${APP_ID_TEST}\nsave\nbye" | xmllint --shell manifest.xml | grep -v ">" 
     GITCOUNT=$(git rev-list --count --first-parent main..${BRANCH})
+    #GITCOUNT=$(git rev-list --count HEAD)
 
-    echo "Set AppName=${APP_NAME} ${APP_VERSION}.${BRANCH}.${GITCOUNT}"
-    echo -e "cd /strings/string[@id=\"AppName\"]\nset ${APP_NAME} ${APP_VERSION}.${BRANCH}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
+    echo "Set AppName=${APP_NAME} ${SYSTEM}.${BRANCH}.${GITCOUNT}"
+    echo -e "cd /strings/string[@id=\"AppName\"]\nset ${APP_NAME} ${SYSTEM}.${BRANCH}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
     echo "Set version=${APP_VERSION}.${BRANCH}.${GITCOUNT}"
     echo -e "cd /strings/string[@id=\"version\"]\nset ${APP_VERSION}.${BRANCH}.${GITCOUNT}\nsave" | xmllint --shell ${APP_FILE} | grep -v ">"
 else
@@ -68,6 +71,19 @@ fi;
 
 echo -e "\n****************************************\nBUILD ${APP_NAME} ${APP_VERSION}.${BRANCH}.${GITCOUNT}\n----------------------------------------"
 
+if [[ -n ${SYSTEM} ]]; then
+    find bin/ -type f -name "${APP_NAME}-*.iq" -exec rm {} \;
+    echo -e "\nGenerate ${APP_NAME}-${GITCOUNT}..."
+    echo_and_exec java -Xms1g -"Dfile.encoding=UTF-8" -"Dapple.awt.UIElement=true"    \
+        -jar "${SDK}"bin/monkeybrains.jar \
+        --output "bin/${APP_NAME}-${GITCOUNT}.iq"    \
+        --jungles "monkey.jungle" \
+        --private-key ${DEV_KEY}    \
+        --package-app --release --warn
+    echo -e "Generated bin/${APP_NAME}-${GITCOUNT}.iq"
+fi;
+
+
 
 echo -e "########################################\n"
 
@@ -83,7 +99,7 @@ fi
 
 
 
-set -e # halt on error
+
 exit;
 
 
