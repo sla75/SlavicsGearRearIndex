@@ -39,7 +39,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     private var colorMode as ColorMode;
 
     function initialize() {
-        System.println("SlavicsGearRearView.initialize()");
+        System.println("SlavicsGearIndexView.initialize()");
         SlavicsSimpleDataField.initialize();
         unitTeeths=Application.loadResource(Rez.Strings.unitTeeths);
         var pos=Application.loadResource(Rez.Strings.version).find("Test") as Number or Null;
@@ -54,7 +54,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     }
 
     function onLayout(dc as Dc) as Void {
-        System.println("SlavicsGearRearView.onLayout() "+dc.getWidth()+"x"+dc.getHeight());
+        System.println("SlavicsGearIndexView.onLayout() "+dc.getWidth()+"x"+dc.getHeight());
         SlavicsSimpleDataField.onLayout(dc);
         teethsLabel.locX=self.rim;
         teethsLabel.locY=self.labelLine;
@@ -72,7 +72,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         /***/
     }
     public function handleSettingUpdate() as Void {
-        System.println("SlavicsGearRearView.onSettingsChanged()");
+        System.println("SlavicsGearIndexView.onSettingsChanged()");
         teethsLabel.setVisible(Properties.getValue("property_showteeth") as Boolean);
         colorMode.handleSettingUpdate();
     }
@@ -87,21 +87,7 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
         SlavicsSimpleDataField.compute(info);
         colorMode.compute();
         SlavicsSimpleDataField.setColors(colorMode.getColors());
-        /***
-        var bsds=rearShift.getDeviceState() as AntPlus.DeviceState;
-        if(bsds!=null&&bsds.state!=null){
-            switch(bsds.state){
-                case AntPlus.DEVICE_STATE_SEARCHING:
-                    self.labelArea.setColor(System.getClockTime().sec%2==0?" ."+label+". ":".."+label+"..");
-                    break;
-                case AntPlus.DEVICE_STATE_TRACKING:
-                    self.setTextLabel(label);
-                    break;
-                default:
-                    self.setTextLabel("?"+label+"?");
-            }
-        }
-        /***/
+
         batteries=rearShift.getBatteries() as Array<RearShifting.BatteryData>;
 
         var rds=rearShift.getRearDerailleurStatus() as AntPlus.DerailleurStatus;
@@ -168,18 +154,16 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
     var battFont=Graphics.FONT_TINY;
 
     public function onUpdate(dc as Dc) as Void {
-        System.println("SlavicsGearRearView.onUpdate()");
+        System.println("SlavicsGearIndexView.onUpdate()");
         SlavicsSimpleDataField.onUpdate(dc);
         if(versionTest!=null){
             dc.setColor(Graphics.COLOR_YELLOW,Graphics.COLOR_TRANSPARENT);
             dc.drawText(1,1,Graphics.FONT_XTINY,versionTest,Graphics.TEXT_JUSTIFY_LEFT);
         }
         teethsLabel.draw(dc);
-        //var FBT=WatchUi.loadResource(Rez.Fonts.BatterySmall);
-        //b.setFont(FBT);
+        
         if(batteries.size()>0){
             // Draw batteries
-            
             var bLocX=dc.getWidth()-rim;
             var bLocY=dc.getHeight()-rim-Graphics.getFontHeight(battIcon.getFont());
             battIcon.locY=dc.getHeight()-rim-Graphics.getFontAscent(battIcon.getFont());
@@ -196,118 +180,17 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
 
                     dc.setColor(colorMode.getFieldColor(:label),Graphics.COLOR_TRANSPARENT);
                     dc.drawText(
-                        bLocX-battIcon.getWidth(dc)-3,
+                        bLocX-battIcon.getWidth(dc)-2,
                         bLocY+(Graphics.getFontHeight(battIcon.getFont())-Graphics.getFontHeight(battFont)),
                         battFont,bd.get(:name),Graphics.TEXT_JUSTIFY_RIGHT);
                     
                     bLocY-=Graphics.getFontHeight(battIcon.getFont())+3;
                 }
             }
-            /***
-            bLocX=rim+5;
-            var tt="0123456";
-            var bFont=WatchUi.loadResource(Rez.Fonts.BatteryMedium);
-            var bM=dc.getTextDimensions(tt,bFont);
-
-            dc.setColor(Graphics.COLOR_GREEN,Graphics.COLOR_TRANSPARENT);
-            dc.drawLine(bLocX-3,bLocY,bLocX+bM[0]+3,bLocY);
-            dc.drawLine(bLocX,bLocY-3,bLocX,bLocY+bM[1]+3);
-            dc.drawLine(bLocX-3,bLocY+Graphics.getFontAscent(bFont),bLocX+bM[0]+3,bLocY+Graphics.getFontAscent(bFont));
-            dc.drawLine(bLocX-3,bLocY+Graphics.getFontHeight(bFont),bLocX+bM[0]+3,bLocY+Graphics.getFontHeight(bFont));
-
-            dc.setColor(Graphics.COLOR_BLACK,Graphics.COLOR_LT_GRAY);
-            dc.drawText(bLocX,bLocY,bFont,"BBBBBBB",Graphics.TEXT_JUSTIFY_LEFT);
-            dc.setColor(Graphics.COLOR_WHITE,Graphics.COLOR_TRANSPARENT);
-            dc.drawText(bLocX,bLocY,bFont,"FFFFFFF",Graphics.TEXT_JUSTIFY_LEFT);
-            dc.setColor(Graphics.COLOR_DK_GREEN,Graphics.COLOR_TRANSPARENT);
-            dc.drawText(bLocX,bLocY,bFont,tt,Graphics.TEXT_JUSTIFY_LEFT);
-
-            bLocX+=bM[0]+20;
-            battIcon.locX=bLocX;
-            battIcon.locY=bLocY;
-            battIcon.compute(AntPlus.BATT_STATUS_NEW,true);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_NEW,false);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_GOOD,false);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_OK,false);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_LOW,false);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_CRITICAL,false);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_INVALID,false);
-            battIcon.draw(dc);
-
-            bLocX+=dc.getTextDimensions("0",bFont)[0];
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_CNT,false);
-            battIcon.draw(dc);
-
-            //bM=dc.getTextDimensions(tt,Graphics.FONT_MEDIUM);
-            /***
-            dc.setColor(Graphics.COLOR_RED,Graphics.COLOR_TRANSPARENT);
-            dc.drawLine(bLocX-3,bLocY,bLocX+bM[0]+3,bLocY);
-            dc.drawLine(bLocX,bLocY-3,bLocX,bLocY+bM[1]+3);
-            dc.drawLine(bLocX-3,bLocY+Graphics.getFontAscent(Graphics.FONT_MEDIUM),bLocX+bM[0]+3,bLocY+Graphics.getFontAscent(Graphics.FONT_MEDIUM));
-            dc.drawLine(bLocX-3,bLocY+Graphics.getFontHeight(Graphics.FONT_MEDIUM),bLocX+bM[0]+3,bLocY+Graphics.getFontHeight(Graphics.FONT_MEDIUM));
-
-            dc.setColor(Graphics.COLOR_DK_RED,Graphics.COLOR_LT_GRAY);
-            dc.drawText(bLocX,bLocY,Graphics.FONT_MEDIUM,tt,Graphics.TEXT_JUSTIFY_LEFT);
-
-            
-            /***
-            battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_NEW,true);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_GOOD,false);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_OK,false);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_LOW,false);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_INVALID,false);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_CRITICAL,false);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            battIcon.compute(AntPlus.BATT_STATUS_CNT,false);
-            battIcon.draw(dc);bLocX-=battIcon.getWidth(dc);battIcon.locX=bLocX;
-            
-            dc.setColor(Graphics.COLOR_LT_GRAY,Graphics.COLOR_TRANSPARENT);
-            dc.drawLine(0,bLocY,dc.getWidth(),bLocY);
-
-            var fa=Graphics.getFontAscent(battFont);
-            dc.drawLine(bLocX,bLocY-fa,bLocX,bLocY+2*fa);
-            dc.drawLine(0,bLocY+fa,dc.getWidth(),bLocY+fa);
-            dc.drawLine(0,bLocY+fa+Graphics.getFontDescent(battFont),dc.getWidth(),bLocY+fa+Graphics.getFontDescent(battFont));
-            
-            dc.setColor(Graphics.COLOR_BLACK,Graphics.COLOR_TRANSPARENT);
-            dc.drawText(bLocX,bLocY,battFont,"TŤyq",Graphics.TEXT_JUSTIFY_RIGHT);
-            bLocX-=dc.getTextWidthInPixels("TŤyq",battFont);
-            dc.drawText(bLocX,bLocY,battIcon.getFont(),"01023456",Graphics.TEXT_JUSTIFY_RIGHT);
-            //bLocX-=dc.getTextWidthInPixels(bd.get(:name)+" ",Graphics.FONT_XTINY);
-            /***/
         }
+
         if(Properties.getValue("property_showfailure") as Boolean && failLabel.isVisible){
+            
             for(var j=0;j<INVALID_SHIFTS.size();j++){
                 if(j==0){
                     failLabel.locX=rim;
@@ -324,7 +207,9 @@ class SlavicsGearIndexView extends SlavicsSimpleDataField {
                     failLabel.draw(dc);
                 }
             }
+
         }
+
     }
 }
 /***
