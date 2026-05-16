@@ -1,9 +1,28 @@
 #!/usr/bin/env bash
 
+set -e # halt on error
+
+model=$(mtp-detect | grep "Model: Edge") || exit 1
+model="edge"$(echo $model | cut -d' ' -f3)
+echo "Model=$model"
 
 
-mtp-detect | grep "Model: Edge 1050"
-echo "Status=$?"
+TEMP="temp~"
+[[ -d "${TEMP}" ]] || mkdir ${TEMP}
+
+reg_bmp='\s*([0-9]{1,})\s([0-9]{4}-.{14}\.BMP)'
+IFS=$'\n'
+for bmps in $(mtp-filetree | grep -oP $reg_bmp); do
+    if [[ ${bmps} =~ ${reg_bmp} ]]; then
+        num="${BASH_REMATCH[1]}"
+        file="${BASH_REMATCH[2]}"
+        echo "${num}. ${file}"
+        echo mtp-getfile ${num} "${TEMP}/${file}"
+        mtp-getfile ${num} "${TEMP}/${model}${file}"
+        [[ -e "${TEMP}/${model}${file}" ]] && mtp-delfile -n ${num}
+    fi
+done;
+
 exit 0
 
 MTP="../../MTP/"
